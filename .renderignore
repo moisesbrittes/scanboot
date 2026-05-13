@@ -1,0 +1,4 @@
+# Render ignore
+scans/temp/*
+node_modules/
+.git
