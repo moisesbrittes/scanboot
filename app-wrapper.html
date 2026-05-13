@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scanner OCR System</title>
+  <script>
+    window.process = { env: { REACT_APP_API_BASE: window.location.origin } };
+  </script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const API_BASE = window.location.origin;
+    const SUPABASE_URL = 'https://elgkzvhsvgadefwvwyol.supabase.co';
+
+    // Componente simples para teste
+    function App() {
+      const [documents, setDocuments] = useState([]);
+      const [currentTab, setCurrentTab] = useState('upload');
+      const [file, setFile] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const [message, setMessage] = useState('');
+
+      useEffect(() => {
+        loadDocuments();
+      }, []);
+
+      const loadDocuments = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/api/documents`);
+          const data = await response.json();
+          setDocuments(data.documents || []);
+        } catch (err) {
+          console.error('Erro ao carregar documentos:', err);
+        }
+      };
+
+      const handleUpload = async (e) => {
+        e.preventDefault();
+        if (!file) return;
+
+        setLoading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const response = await fetch(`${API_BASE}/api/documents/upload-process`, {
+            method: 'POST',
+            body: formData
+          });
+          const data = await response.json();
+          setMessage('✓ Upload realizado com sucesso!');
+          setFile(null);
+          loadDocuments();
+        } catch (err) {
+          setMessage('✗ Erro ao fazer upload: ' + err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', fontFamily: 'sans-serif' }}>
+          <h1>🖨️ Scanner OCR System</h1>
+
+          <div style={{ marginBottom: '20px' }}>
+            <button onClick={() => setCurrentTab('upload')} style={{ marginRight: '10px', padding: '10px 20px' }}>
+              📤 Upload
+            </button>
+            <button onClick={() => setCurrentTab('list')} style={{ padding: '10px 20px' }}>
+              📋 Documentos
+            </button>
+          </div>
+
+          {currentTab === 'upload' && (
+            <div style={{ border: '1px dashed #ccc', padding: '20px', borderRadius: '8px' }}>
+              <h2>Fazer Upload</h2>
+              <form onSubmit={handleUpload}>
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={(e) => setFile(e.target.files[0])}
+                  style={{ marginBottom: '10px', display: 'block' }}
+                />
+                <button type="submit" disabled={!file || loading} style={{ padding: '10px 20px', cursor: 'pointer' }}>
+                  {loading ? '⏳ Processando...' : '✓ Processar'}
+                </button>
+              </form>
+              {message && <p style={{ marginTop: '10px', color: message.includes('✓') ? 'green' : 'red' }}>{message}</p>}
+            </div>
+          )}
+
+          {currentTab === 'list' && (
+            <div>
+              <h2>Documentos ({documents.length})</h2>
+              {documents.length === 0 ? (
+                <p>Nenhum documento ainda</p>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
+                  {documents.map((doc) => (
+                    <div key={doc.id} style={{ border: '1px solid #ccc', padding: '10px', borderRadius: '8px' }}>
+                      <h3>{doc.filename}</h3>
+                      <p><strong>Confiança:</strong> {Math.round(doc.ocr_confidence * 100)}%</p>
+                      <p><strong>Data:</strong> {new Date(doc.scan_date).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

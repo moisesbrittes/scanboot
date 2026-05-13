@@ -50,7 +50,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Servir interface React PRIMEIRO
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'app.html'));
+  res.sendFile(path.join(__dirname, 'app-wrapper.html'));
 });
 
 // Depois servir arquivos estáticos
