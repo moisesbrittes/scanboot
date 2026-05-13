@@ -8,6 +8,8 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "prod": "NODE_ENV=production node server.js",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -33,7 +35,11 @@
     "ws": "^8.14.2"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "engines": {
     "node": ">=16.0.0"

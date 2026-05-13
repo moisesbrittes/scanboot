@@ -49,6 +49,11 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static('./'));
 
+// Servir interface React
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'app.html'));
+});
+
 // Multer para upload temporário
 const upload = multer({
   dest: UPLOAD_DIR,
