@@ -104,8 +104,8 @@ class OCRService {
 
 class ShareService {
   constructor() {
-    this.twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-    this.transporter = nodemailer.createTransport({
+    this.twilioClient = process.env.TWILIO_ACCOUNT_SID ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN) : null;
+    this.transporter = process.env.SMTP_USER ? nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
       secure: true,
@@ -113,11 +113,12 @@ class ShareService {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
       }
-    });
+    }) : null;
   }
 
   async shareViaEmail(documentUrl, recipient, filename) {
     try {
+      if (!this.transporter) throw new Error('Email não configurado');
       await this.transporter.sendMail({
         from: process.env.SMTP_USER,
         to: recipient,
@@ -133,6 +134,7 @@ class ShareService {
 
   async shareViaWhatsApp(message, phoneNumber) {
     try {
+      if (!this.twilioClient) throw new Error('WhatsApp não configurado');
       await this.twilioClient.messages.create({
         body: message,
         from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
