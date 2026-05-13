@@ -47,12 +47,14 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.static('./'));
 
-// Servir interface React
+// Servir interface React PRIMEIRO
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'app.html'));
 });
+
+// Depois servir arquivos estáticos
+app.use(express.static('./'));
 
 // Multer para upload temporário
 const upload = multer({
