@@ -27,7 +27,11 @@ const wss = new WebSocket.Server({ server });
 const supabaseUrl = process.env.SUPABASE_URL || 'https://elgkzvhsvgadefwvwyol.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsZ2t6dmhzdmdhZGVmd3Z3eW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NTY3MDYsImV4cCI6MjA5NDIzMjcwNn0.gtbrbWrQeCInTNFPYIXCTGK_GrbRkoSyejorc3Z8Q-E';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  realtime: {
+    transport: WebSocket
+  }
+});
 
 // ==================== CONFIGURAÇÕES ====================
 
