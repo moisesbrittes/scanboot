@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar dependências
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # ===== PRODUCTION STAGE =====
 FROM node:20-alpine
